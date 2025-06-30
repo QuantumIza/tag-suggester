@@ -1,5 +1,24 @@
+# Environnement virtuel
 venv/
+
+# Fichiers Python compilés
 __pycache__/
+*.py[cod]
+
+# Notebooks temporaires
 .ipynb_checkpoints/
-*.pyc
+
+# Données
+data/raw/
+data/processed/
+
+# MLflow
+mlruns/
+.trash/
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# Secrets éventuels
 .env

@@ -1,0 +1,14 @@
+artifact_uri: file:///D:/machine_learning_training/openclassrooms_projects/05_categorisez_automatiquement_question/mlruns/727206638210680917/45d61f1e9fdb441dacb339c109852ec5/artifacts
+end_time: 1751267504484
+entry_point_name: ''
+experiment_id: '727206638210680917'
+lifecycle_stage: active
+run_id: 45d61f1e9fdb441dacb339c109852ec5
+run_name: peaceful-moth-700
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1751267498792
+status: 3
+tags: []
+user_id: hp

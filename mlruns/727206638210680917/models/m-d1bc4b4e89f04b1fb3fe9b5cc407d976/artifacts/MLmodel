@@ -1,0 +1,22 @@
+artifact_path: file:///D:/machine_learning_training/openclassrooms_projects/05_categorisez_automatiquement_question/mlruns/727206638210680917/models/m-d1bc4b4e89f04b1fb3fe9b5cc407d976/artifacts
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.12.2
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.7.0
+mlflow_version: 3.1.1
+model_id: m-d1bc4b4e89f04b1fb3fe9b5cc407d976
+model_size_bytes: 330
+model_uuid: m-d1bc4b4e89f04b1fb3fe9b5cc407d976
+prompts: null
+run_id: d369c04cbcfb4b849b3a33dbaff17c4e
+utc_time_created: '2025-06-30 07:09:45.339023'

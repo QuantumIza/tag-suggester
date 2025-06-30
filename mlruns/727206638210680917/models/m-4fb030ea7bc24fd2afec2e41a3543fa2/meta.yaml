@@ -1,0 +1,10 @@
+artifact_location: file:///D:/machine_learning_training/openclassrooms_projects/05_categorisez_automatiquement_question/mlruns/727206638210680917/models/m-4fb030ea7bc24fd2afec2e41a3543fa2/artifacts
+creation_timestamp: 1751267257014
+experiment_id: '727206638210680917'
+last_updated_timestamp: 1751267280801
+model_id: m-4fb030ea7bc24fd2afec2e41a3543fa2
+model_type: null
+name: model
+source_run_id: b30b6d1b65da4a69a0dd27e485969fdc
+status: 2
+status_message: null

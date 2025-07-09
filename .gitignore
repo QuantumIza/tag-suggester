@@ -22,3 +22,7 @@ Thumbs.db
 
 # Secrets éventuels
 .env
+
+# Ressources NLTK (si téléchargées localement)
+nltk_data/
+*.nltk

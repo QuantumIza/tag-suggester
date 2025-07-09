@@ -1,0 +1,9 @@
+asp.net
+node.js
+c#
+c++
+react.js
+scikit-learn
+pandas
+tensorflow
+mvc 3

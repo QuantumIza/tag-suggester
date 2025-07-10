@@ -947,3 +947,32 @@ def document_vector_spacy(doc, model, nlp):
         return np.mean(vectors, axis=0)
     else:
         return np.zeros(model.vector_size)
+
+
+from sklearn.feature_extraction.text import CountVectorizer
+
+def build_bow_matrix(df, col_title="clean_title", col_body="clean_body",
+                     max_df=0.95, min_df=2, stop_words="english"):
+    """
+    Vectorise le corpus en Bag-of-Words à partir du titre + corps concaténés.
+    
+    Parameters:
+    - df : pd.DataFrame contenant les colonnes textuelles
+    - col_title / col_body : noms des colonnes à concaténer
+    - max_df / min_df : filtres de fréquence pour CountVectorizer
+    - stop_words : langue pour la suppression des stopwords
+    
+    Returns:
+    - corpus : liste des textes concaténés
+    - X_bow : matrice sparse BoW
+    - vocab : liste des tokens conservés
+    """
+    corpus = df[[col_title, col_body]].apply(
+        lambda x: " ".join(x.dropna().astype(str)), axis=1
+    )
+    
+    vectorizer = CountVectorizer(max_df=max_df, min_df=min_df, stop_words=stop_words)
+    X_bow = vectorizer.fit_transform(corpus)
+    vocab = vectorizer.get_feature_names_out().tolist()
+    
+    return corpus, X_bow, vocab

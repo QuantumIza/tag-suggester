@@ -1,4 +1,5 @@
-from utils.stop_terms import load_stop_terms
+
+from preprocessing.text_cleaning import load_stop_terms
 from wordcloud import WordCloud
 import pandas as pd
 from collections import Counter
@@ -13,7 +14,10 @@ import numpy as np
 import networkx as nx
 from sklearn.manifold import TSNE
 import umap.umap_ as umap
-
+from gensim.models import Word2Vec
+import logging
+import os
+from sentence_transformers import SentenceTransformer
 
 def compute_word_frequencies(df, column, top_n=100, exclude_words=None):
     """
@@ -976,3 +980,138 @@ def build_bow_matrix(df, col_title="clean_title", col_body="clean_body",
     vocab = vectorizer.get_feature_names_out().tolist()
     
     return corpus, X_bow, vocab
+
+
+
+
+
+def train_word2vec(corpus, save_path="model_word2vec.bin",
+                   vector_size=100, window=5, min_count=3,
+                   workers=1, sg=1, epochs=10, verbose=True):
+    """
+    Entraîne un modèle Word2Vec à partir du corpus texte pré-nettoyé.
+    
+    Parameters:
+    - corpus : liste de phrases (chaînes de caractères) déjà nettoyées
+    - save_path : chemin pour sauvegarder le modèle entraîné
+    - vector_size, window, min_count, sg, workers, epochs : paramètres Word2Vec
+    - verbose : affiche les logs si True
+    
+    Returns:
+    - model : modèle entraîné (gensim Word2Vec)
+    """
+    if verbose:
+        print("🔄 Préparation du corpus...")
+    
+    # Tokenisation de chaque phrase
+    try:
+        sentences = [sentence.split() for sentence in corpus]
+    except Exception as e:
+        print("🚨 Erreur de tokenisation :", e)
+        return None
+
+    if verbose:
+        print(f"🧠 Corpus prêt avec {len(sentences)} documents.")
+
+    # Activation du logger de Gensim (si souhaité)
+    if verbose:
+        logging.basicConfig(format="%(levelname)s - %(asctime)s - %(message)s", level=logging.INFO)
+
+    try:
+        # Entraînement du modèle Word2Vec
+        model = Word2Vec(
+            sentences=sentences,
+            vector_size=vector_size,
+            window=window,
+            min_count=min_count,
+            workers=workers,
+            sg=sg,
+            epochs=epochs
+        )
+
+        # Sauvegarde du modèle
+        model.save(save_path)
+        if verbose:
+            print(f"💾 Modèle sauvegardé dans {os.path.abspath(save_path)}")
+
+        return model
+
+    except Exception as e:
+        print("❌ Erreur lors de l'entraînement :", e)
+        return None
+
+
+
+import kagglehub
+import tensorflow_hub as hub
+
+use_model = None
+
+def encode_with_use(text: str) -> np.ndarray:
+    global use_model
+    if use_model is None:
+        try:
+            path = kagglehub.model_download("google/universal-sentence-encoder/tensorFlow2/universal-sentence-encoder")
+            use_model = hub.load(path)
+            print(f"✅ USE chargé depuis : {path}")
+        except Exception as e:
+            print(f"❌ Erreur chargement USE : {str(e)}")
+            raise
+    return use_model([text])[0].numpy()
+
+import numpy as np
+
+def encode_use_corpus(corpus, batch_size=100, verbose=True):
+    global use_model
+    if use_model is None:
+        path = kagglehub.model_download("google/universal-sentence-encoder/tensorFlow2/universal-sentence-encoder")
+        use_model = hub.load(path)
+        print(f"✅ USE chargé depuis : {path}")
+
+    embeddings = []
+    for i in range(0, len(corpus), batch_size):
+        batch = corpus[i:i+batch_size]
+        emb = use_model(batch).numpy()
+        embeddings.append(emb)
+        if verbose:
+            print(f"🔄 Batch {i} → {i + len(batch)} encodé")
+
+    return np.vstack(embeddings)
+
+
+
+sbert_model = None
+
+def get_sbert_model(model_name="all-MiniLM-L6-v2"):
+    global sbert_model
+    if sbert_model is None:
+        print("🔄 Chargement du modèle SBERT...")
+        sbert_model = SentenceTransformer(model_name)
+        print("✅ SBERT chargé :", model_name)
+    return sbert_model
+
+
+def encode_sbert_corpus(corpus, batch_size=32, verbose=True):
+    model = get_sbert_model()
+    embeddings = []
+
+    for i in range(0, len(corpus), batch_size):
+        batch = corpus[i:i + batch_size]
+        emb = model.encode(batch, show_progress_bar=False)
+        embeddings.append(emb)
+        if verbose:
+            print(f"➡️ Batch {i} à {i+len(batch)} encodé")
+
+    return np.vstack(embeddings)
+
+
+def vectorize_texts(texts, w2v_model):
+    vectors = []
+    for sentence in texts:
+        words = sentence.split()
+        word_vecs = [w2v_model.wv[word] for word in words if word in w2v_model.wv]
+        if word_vecs:
+            vectors.append(np.mean(word_vecs, axis=0))
+        else:
+            vectors.append(np.zeros(w2v_model.vector_size))
+    return np.array(vectors)

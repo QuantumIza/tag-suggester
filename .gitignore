@@ -1,6 +1,6 @@
 # Environnement virtuel
 venv/
-
+*.log
 # Fichiers Python compilés
 __pycache__/
 *.py[cod]
@@ -26,3 +26,39 @@ Thumbs.db
 # Ressources NLTK (si téléchargées localement)
 nltk_data/
 *.nltk
+
+# Artifacts et modèles
+models/
+mlruns/
+*.joblib
+
+# Fichiers temporaires
+*.tmp
+*.bak
+
+# Dossiers d’OS
+.DS_Store
+Thumbs.db
+
+# VS Code (fichiers de config locaux)
+.vscode/
+settings.json
+
+# Fichiers notebooks vectoriels, artefacts lourds
+notebooks/data/vectors/
+*.npy
+*.npz
+*.pkl
+*.parquet
+*.txt
+
+# Dossiers egg-info générés par setup.py
+src/**/stackflow_cleaner.egg-info/
+src/**/dependency_links.txt
+src/**/PKG-INFO
+src/**/SOURCES.txt
+src/**/top_level.txt
+
+# Tests temporaires
+tests/test_api.py
+tests/test_embeddings_api.py

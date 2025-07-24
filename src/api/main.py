@@ -1,7 +1,6 @@
+# --- POINT D'ENTREE DE L'API AVEC FASTAPI
 from fastapi import FastAPI
-from src.api.routes.embed_routes import router as embed_router
-
+from src.api.routes.predict_routes import router as predict_router
 app = FastAPI(title="Tag Suggester API")
-
-# Inclusion des routes
-app.include_router(embed_router, prefix="/embed", tags=["Embeddings"])
+# INCLUSION DES ROUTES
+app.include_router(predict_router, prefix="/predict", tags=["Tagging"])

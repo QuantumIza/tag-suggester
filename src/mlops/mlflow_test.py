@@ -8,4 +8,4 @@ mlflow.set_experiment("tag_suggester")
 with mlflow.start_run():
     mlflow.log_param("model_type", "LogisticRegression")
     mlflow.log_metric("f1_score", 0.81)
-    mlflow.sklearn.log_model(LogisticRegression(), name="model")
+    mlflow.sklearn.log_model(LogisticRegression(), artifact_path="model")

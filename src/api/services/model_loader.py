@@ -24,7 +24,7 @@ print(f"✅ Fichier existe : {os.path.exists(CONFIG_PATH)}")
 # -----------------------------
 # 🚀 SBERT : chargement du modèle pré-entraîné
 # -----------------------------
-sbert_model = SentenceTransformer("all-MiniLM-L6-v2")
+sbert_model = SentenceTransformer("all-MiniLM-L6-v2") # TODO : svg pickle
 
 # -----------------------------
 # 🚀 Fonction de chargement différé

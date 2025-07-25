@@ -21,7 +21,7 @@ jobs:
         run: |
           $model_installed = python -m spacy validate | Select-String "en_core_web_sm"
           if (-not $model_installed) {
-          python -m spacy download en_core_web_sm
+            python -m spacy download en_core_web_sm
           }
 
       - name: Lancer les tests

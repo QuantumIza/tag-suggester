@@ -17,11 +17,12 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
-      - name: Lancer les tests
-        run: pytest
       - name: Check and install SpaCy model
         run: |
          if ! python -m spacy validate | grep -q en_core_web_sm; then
           python -m spacy download en_core_web_sm
          fi
+      - name: Lancer les tests
+        run: pytest
+      
 

@@ -7,12 +7,16 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import cross_val_score, KFold
 from sklearn.metrics import multilabel_confusion_matrix
+from sklearn.base import clone
 import os
 import joblib
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import mlflow
+import json
+
+
 
 def split_on_indices(X, Y, train_idx, test_idx):
     return X[train_idx], X[test_idx], Y[train_idx], Y[test_idx]
@@ -307,8 +311,61 @@ def compile_metrics(df_split, df_cv):
 
     return pd.DataFrame(metrics).sort_values("F1_cv", ascending=False)
 
+def select_best_vecteur(df_metrics, min_f1=0.4, min_coverage=0.3, ranking_col="f1_micro"):
+    """
+    Sélectionne le meilleur vecteur selon des critères multiples.
+    Retourne le nom du vecteur.
+    """
+    filtered = df_metrics[
+        (df_metrics[ranking_col] >= min_f1) &
+        (df_metrics["coverage_tags"] >= min_coverage)
+    ]
 
-def save_best_model(df_metrics, splits_dict, y_train, model_class, model_wrapper=None, model_type="model", save_dir="models"):
+    if not filtered.empty:
+        best_vect = filtered.sort_values(ranking_col, ascending=False).iloc[0]["vecteur"]
+    else:
+        best_vect = df_metrics.sort_values(ranking_col, ascending=False).iloc[0]["vecteur"]
+
+    print(f"🎯 Vecteur sélectionné : {best_vect}")
+    return best_vect
+
+def save_best_model(df_metrics, splits_dict, y_train,
+                    model_class, model_wrapper=None,
+                    model_type="model", save_dir="models"):
+
+    os.makedirs(save_dir, exist_ok=True)
+
+    # 🔍 Sélection du vecteur
+    best_vect = select_best_vecteur(df_metrics)
+    X_train_best, _ = splits_dict[best_vect]
+
+    # ⚙️ Instanciation du modèle
+    model = model_class()
+    if model_wrapper:
+        model = model_wrapper(clone(model))
+
+    # 🚀 Entraînement
+    model.fit(X_train_best, y_train)
+
+    # 💾 Sauvegarde du modèle
+    model_filename = f"{model_type}_final_{best_vect}.joblib"
+    model_path = os.path.join(save_dir, model_filename)
+    joblib.dump(model, model_path)
+
+    # 📝 Sauvegarde de la config pour API
+    config_path = os.path.join(save_dir, "config_best_model.json")
+    with open(config_path, "w") as f:
+        json.dump({
+            "vectorizer": best_vect,
+            "model_path": model_path
+        }, f)
+
+    print(f"✅ Modèle sauvegardé : {model_path}")
+    print(f"📝 Config enregistrée : {config_path}")
+
+    return model, best_vect, model_path
+
+def save_best_model_old(df_metrics, splits_dict, y_train, model_class, model_wrapper=None, model_type="model", save_dir="models"):
     import os
     os.makedirs(save_dir, exist_ok=True)
 

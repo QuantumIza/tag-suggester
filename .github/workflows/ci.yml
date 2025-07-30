@@ -9,37 +9,45 @@ jobs:
         python-version: ['3.11']
     steps:
       - uses: actions/checkout@v3
+
       - name: Installer Python
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Nettoyage des artefacts obsolètes (Windows compatible)
+
+      - name: ⚔️ Purge totale des artefacts obsolètes
         run: |
-          $eggInfoDirs = Get-ChildItem -Recurse -Include *.egg-info
-          if ($eggInfoDirs) {
-            $eggInfoDirs | Remove-Item -Recurse -Force
-          }
+          # Supprimer tous les fichiers .pyc
+          Get-ChildItem -Recurse -Include *.pyc | Remove-Item -Force
 
-          if (Test-Path "dist") {
-            Remove-Item -Recurse -Force "dist"
-          }
+          # Supprimer tous les dossiers __pycache__
+          Get-ChildItem -Recurse -Directory -Filter "__pycache__" | Remove-Item -Recurse -Force
 
-          if (Test-Path "build") {
-            Remove-Item -Recurse -Force "build"
-          }
+          # Supprimer les egg-info
+          Get-ChildItem -Recurse -Include *.egg-info | Remove-Item -Recurse -Force
 
-      - name: Installer les dépendances
+          # Supprimer dist et build
+          if (Test-Path "dist") { Remove-Item -Recurse -Force "dist" }
+          if (Test-Path "build") { Remove-Item -Recurse -Force "build" }
+
+      - name: 🔥 Désinstaller stackflow_cleaner si fantôme présent
+        run: |
+          pip uninstall -y stackflow_cleaner || echo "stackflow_cleaner non installé (ouf!)"
+
+      - name: 🚿 Purge du cache pip
+        run: pip cache purge
+
+      - name: 📦 Installer les dépendances
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
-      - name: Check and install SpaCy model (Windows)
+
+      - name: 🧠 Vérifier et installer SpaCy model
         run: |
           $model_installed = python -m spacy validate | Select-String "en_core_web_sm"
           if (-not $model_installed) {
             python -m spacy download en_core_web_sm
           }
 
-      - name: Lancer les tests
+      - name: 🧪 Lancer les tests
         run: pytest
-      
-

@@ -13,11 +13,10 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Clean up old metadata
+      - name: Supprimer les fichiers egg-info
         run: |
-          rm -rf src/*.egg-info
-          rm -rf build/
-          rm -rf dist/
+          Get-ChildItem -Recurse -Include *.egg-info | Remove-Item -Recurse -Force
+          Remove-Item -Recurse -Force dist, build
       - name: Installer les dépendances
         run: |
           pip install --upgrade pip

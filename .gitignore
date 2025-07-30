@@ -53,7 +53,7 @@ notebooks/data/vectors/
 *.txt
 
 # Dossiers egg-info générés par setup.py
-src/**/stackflow_cleaner.egg-info/
+src/**/tags_suggester.egg-info/
 src/**/dependency_links.txt
 src/**/PKG-INFO
 src/**/SOURCES.txt

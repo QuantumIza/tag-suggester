@@ -30,9 +30,7 @@ jobs:
           if (Test-Path "dist") { Remove-Item -Recurse -Force "dist" }
           if (Test-Path "build") { Remove-Item -Recurse -Force "build" }
 
-      - name: 🔥 Désinstaller stackflow_cleaner si fantôme présent
-        run: |
-          pip uninstall -y stackflow_cleaner || echo "stackflow_cleaner non installé (ouf!)"
+      
 
       - name: 🚿 Purge du cache pip
         run: pip cache purge

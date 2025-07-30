@@ -13,10 +13,21 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Supprimer les fichiers egg-info
+      - name: Nettoyage des artefacts obsolètes (Windows compatible)
         run: |
-          Get-ChildItem -Recurse -Include *.egg-info | Remove-Item -Recurse -Force
-          Remove-Item -Recurse -Force dist, build
+          $eggInfoDirs = Get-ChildItem -Recurse -Include *.egg-info
+          if ($eggInfoDirs) {
+            $eggInfoDirs | Remove-Item -Recurse -Force
+          }
+
+          if (Test-Path "dist") {
+            Remove-Item -Recurse -Force "dist"
+          }
+
+          if (Test-Path "build") {
+            Remove-Item -Recurse -Force "build"
+          }
+
       - name: Installer les dépendances
         run: |
           pip install --upgrade pip

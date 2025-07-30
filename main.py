@@ -1,1 +1,1 @@
-from src.api.main import app
+from src.tags_suggester.api.main import app

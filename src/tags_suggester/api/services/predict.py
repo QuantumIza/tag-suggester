@@ -1,4 +1,4 @@
-from src.api.services.model_loader import load_model
+from src.tags_suggester.api.services.model_loader import load_model
 
 # def predict_tags(title, body, vectorizer_name):
 #     # Simplification ici, on suppose un vectorizer intégré au modèle
@@ -10,7 +10,6 @@ from src.api.services.model_loader import load_model
 #     return prediction[0] if hasattr(prediction, '__iter__') else [prediction]
 
 
-from src.api.services.model_loader import load_model
 import joblib
 import os
 

@@ -86,7 +86,7 @@ def predict_tags_old(title, body):
 def predict_tags(title, body):
     import os
     import joblib
-    from src.api.services.model_loader import load_model_and_vectorizer
+    from src.tags_suggester.api.services.model_loader import load_model_and_vectorizer
     
 
     # 📝 Préparation du texte

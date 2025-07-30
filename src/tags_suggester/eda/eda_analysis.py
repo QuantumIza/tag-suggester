@@ -1,5 +1,5 @@
 
-from preprocessing.text_cleaning import load_stop_terms
+from tags_suggester.preprocessing.text_cleaning import load_stop_terms
 from wordcloud import WordCloud
 import pandas as pd
 from collections import Counter

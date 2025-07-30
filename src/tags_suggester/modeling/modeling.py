@@ -115,7 +115,7 @@ def run_cv_logreg(name, X, Y, n_splits=5, preprocess=None):
     print(f"📊 F1-micro moyen : {scores.mean():.3f}")
     return scores.mean()
 
-def save_best_model(df_metrics, splits_dict, y_train, model_type="logreg", save_dir="models"):
+def save_best_model_cv(df_metrics, splits_dict, y_train, model_type="logreg", save_dir="models"):
     """
     Sauvegarde le meilleur modèle LogReg entraîné selon le vecteur avec le meilleur score F1_cv.
     

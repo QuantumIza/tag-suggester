@@ -13,6 +13,11 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Clean up old metadata
+        run: |
+          rm -rf src/*.egg-info
+          rm -rf build/
+          rm -rf dist/
       - name: Installer les dépendances
         run: |
           pip install --upgrade pip

@@ -11,15 +11,16 @@ from scipy.sparse import load_npz
 # -----------------------------
 # 🔧 CONFIG PATH
 # -----------------------------
-# 🧱 Vise le répertoire racine du projet
-# 🧭 Corriger pour viser la racine projet
+import os
 
-# 💡 Se positionner à la racine réelle du projet, quelle que soit la profondeur du module
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+# Repartons depuis le fichier actuel (dans src/tags_suggester/api/services)
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
 
 CONFIG_PATH = os.path.join(BASE_DIR, "models", "logreg", "config_best_model.json")
+
 print(f"🔍 Chemin recherché : {CONFIG_PATH}")
 print(f"✅ Fichier existe : {os.path.exists(CONFIG_PATH)}")
+
 
 # -----------------------------
 # 🚀 SBERT : chargement du modèle pré-entraîné

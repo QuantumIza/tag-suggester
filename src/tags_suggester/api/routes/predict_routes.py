@@ -12,5 +12,11 @@ class Question(BaseModel):
 # 🎯 Route POST pour prédiction des tags
 @router.post("/predict")
 def predict_endpoint(q: Question):
-    tags = predict_tags(q.title, q.body)
-    return {"suggested_tags": tags}
+    try:
+        tags = predict_tags(q.title, q.body)
+        return {"suggested_tags": tags}
+    except Exception as e:
+        import traceback
+        traceback.print_exc()  # Affiche dans la console
+        return {"error": str(e)}
+

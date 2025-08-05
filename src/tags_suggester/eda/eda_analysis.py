@@ -827,7 +827,7 @@ def vectorize_tfidf(
         plt.tight_layout()
         plt.show()
     
-    return X_tfidf, vocab, top_words
+    return X_tfidf, vocab, top_words, vectorizer
 
 
 def apply_svd_and_plot(X_tfidf, label="text", n_components=2, random_state=42):
@@ -979,7 +979,7 @@ def build_bow_matrix(df, col_title="clean_title", col_body="clean_body",
     X_bow = vectorizer.fit_transform(corpus)
     vocab = vectorizer.get_feature_names_out().tolist()
     
-    return corpus, X_bow, vocab
+    return corpus, X_bow, vocab, vectorizer
 
 
 
@@ -1061,20 +1061,18 @@ def encode_with_use(text: str) -> np.ndarray:
 
 import numpy as np
 
-def encode_use_corpus(corpus, batch_size=100, verbose=True):
-    global use_model
-    if use_model is None:
-        path = kagglehub.model_download("google/universal-sentence-encoder/tensorFlow2/universal-sentence-encoder")
-        use_model = hub.load(path)
-        print(f"✅ USE chargé depuis : {path}")
-
+def encode_use_corpus(corpus, model_path=None, batch_size=100, verbose=True):
+    if model_path is None:
+        model_path = kagglehub.model_download("google/universal-sentence-encoder/tensorFlow2/universal-sentence-encoder")
+    use_model = hub.load(model_path)
+    print(f"✅ USE chargé depuis : {model_path}")
     embeddings = []
     for i in range(0, len(corpus), batch_size):
         batch = corpus[i:i+batch_size]
         emb = use_model(batch).numpy()
         embeddings.append(emb)
-        if verbose:
-            print(f"🔄 Batch {i} → {i + len(batch)} encodé")
+        # if verbose:
+        #     print(f"🔄 Batch {i} → {i + len(batch)} encodé")
 
     return np.vstack(embeddings)
 
@@ -1091,16 +1089,16 @@ def get_sbert_model(model_name="all-MiniLM-L6-v2"):
     return sbert_model
 
 
-def encode_sbert_corpus(corpus, batch_size=32, verbose=True):
-    model = get_sbert_model()
+def encode_sbert_corpus(corpus, model=None, batch_size=32, verbose=True):
+    if model is None:
+        model = get_sbert_model()
     embeddings = []
-
     for i in range(0, len(corpus), batch_size):
         batch = corpus[i:i + batch_size]
         emb = model.encode(batch, show_progress_bar=False)
         embeddings.append(emb)
-        if verbose:
-            print(f"➡️ Batch {i} à {i+len(batch)} encodé")
+        # if verbose:
+        #     print(f"➡️ Batch {i} à {i+len(batch)} encodé")
 
     return np.vstack(embeddings)
 

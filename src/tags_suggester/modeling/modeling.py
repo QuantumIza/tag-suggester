@@ -434,3 +434,166 @@ def plot_and_log_barplot(df_scores, metric="f1_cv", title=None, save_path="barpl
     
     # Logging MLflow
     mlflow.log_artifact(save_path)
+
+import json
+import joblib
+import os
+
+def save_best_trained_model_old_2(df_metrics, trained_models_dict, save_dir="models/logreg"):
+    os.makedirs(save_dir, exist_ok=True)
+
+    # 🔍 Sélection du vecteur optimal
+    best_vect = select_best_vecteur(df_metrics)
+
+    # 📦 Récupération du modèle déjà entraîné
+    model = trained_models_dict[best_vect]
+
+    # 💾 Sauvegarde du modèle
+    model_filename = f"model_final_{best_vect}.joblib"
+    model_path = os.path.join(save_dir, model_filename)
+    joblib.dump(model, model_path)
+
+    # 📄 Génération du fichier de config
+    config_path = os.path.join(save_dir, "config_best_model.json")
+    config = {
+        "vectorizer": best_vect,
+        "model_path": model_path
+        # (tu peux aussi ajouter "vectorizer_path" ici si besoin pour ton API)
+    }
+    with open(config_path, "w") as f:
+        json.dump(config, f)
+
+    print(f"✅ Modèle final sauvegardé : {model_path}")
+    print(f"📝 Config créée : {config_path}")
+
+    return model, best_vect, model_path
+def save_best_trained_model_old_2(df_metrics, trained_models_dict, save_dir="models/logreg"):
+    os.makedirs(save_dir, exist_ok=True)
+
+    # 🔍 Sélection du vecteur optimal
+    best_vect = select_best_vecteur(df_metrics)
+    model = trained_models_dict[best_vect]
+
+    # 💾 Sauvegarde du modèle
+    model_filename = f"model_final_{best_vect}.joblib"
+    model_path = os.path.join(save_dir, model_filename)
+    joblib.dump(model, model_path)
+
+    # 🔍 Chemins supplémentaires selon le vecteur
+    if best_vect == "tfidf":
+        vectorizer_path = "models/tfidf/tfidf_vectorizer.joblib"
+    elif best_vect == "bow":
+        vectorizer_path = "models/bow/vectorizer_bow_full.pkl"
+    elif best_vect == "sbert":
+        vectorizer_path = "models/sbert/sbert_model"
+    elif best_vect == "use":
+        # Tu avais stocké le chemin USE dans un JSON dédié
+        with open("models/use_model/use_path.json") as f:
+            use_config = json.load(f)
+        vectorizer_path = use_config["path"]
+    elif best_vect == "word2vec":
+        vectorizer_path = "models/word2vec/word2vec_titlebody_full.bin"
+    elif best_vect == "svd":
+        vectorizer_path = "models/tfidf/tfidf_vectorizer.joblib"
+        svd_path = "models/svd/svd_model_10k.pkl"
+    else:
+        raise ValueError(f"Vectorizer '{best_vect}' non reconnu.")
+
+    # 📄 MultiLabelBinarizer — chemin constant
+    mlb_path = "models/tags/multilabel_binarizer_full.pkl"
+
+    # 📄 Génération du fichier config
+    config = {
+        "vectorizer": best_vect,
+        "model_path": model_path,
+        "vectorizer_path": vectorizer_path,
+        "mlb_path": mlb_path
+    }
+
+    # Cas spécial pour SVD : on ajoute le chemin
+    if best_vect == "svd":
+        config["svd_path"] = svd_path
+
+    config_path = os.path.join(save_dir, "config_best_model.json")
+    with open(config_path, "w") as f:
+        json.dump(config, f)
+
+    print(f"✅ Modèle final sauvegardé : {model_path}")
+    print(f"📝 Config enrichi avec chemins : {config_path}")
+
+    return model, best_vect, model_path
+
+from pathlib import Path
+import os, shutil, json, joblib
+
+from pathlib import Path
+import json, joblib, pickle
+
+def save_best_trained_model(model, vectorizer, mlb, model_name, vect_type, svd_model=None):
+    import joblib, json, os
+    from pathlib import Path
+
+    model_dir = Path(__file__).resolve().parent.parent / "models" / model_name
+    model_dir.mkdir(parents=True, exist_ok=True)
+
+    model_path = model_dir / "model.joblib"
+    joblib.dump(model, model_path)
+
+    mlb_path = model_dir / "mlb.joblib"
+    joblib.dump(mlb, mlb_path)
+
+    vectorizer_path = model_dir / "vectorizer"
+    if vect_type in ["tfidf", "svd"]:
+        vectorizer_path = vectorizer_path.with_suffix(".joblib")
+        joblib.dump(vectorizer, vectorizer_path)
+    elif vect_type == "bow":
+        vectorizer_path = vectorizer_path.with_suffix(".pkl")
+        with open(vectorizer_path, "wb") as f:
+            pickle.dump(vectorizer, f)
+    elif vect_type in ["sbert", "use", "word2vec"]:
+        vectorizer_path = str(vectorizer_path)  # path as str for dynamic loading
+        # Le modèle lui-même est conservé ailleurs (pas picklé localement)
+
+    svd_path = None
+    if svd_model:
+        svd_path = model_dir / "svd.joblib"
+        joblib.dump(svd_model, svd_path)
+
+    # ✅ Création du fichier de config
+    config = {
+        "model_path": str(model_path),
+        "vectorizer": vect_type,
+        "vectorizer_path": str(vectorizer_path),
+        "mlb_path": str(mlb_path)
+    }
+
+    if svd_path:
+        config["svd_path"] = str(svd_path)
+
+    config_path = model_dir / "config_best_model.json"
+    with open(config_path, "w") as f:
+        json.dump(config, f, indent=4)
+
+
+
+
+import joblib
+import json
+import os
+# --- A METTRE A JOUR - INCOMPLETE
+def load_pipeline_components(config_path="./models/config_best_model.json"):
+    # Lire le fichier de config
+    with open(config_path, "r") as f:
+        config = json.load(f)
+
+    # Extraire les chemins des composants
+    vectorizer_path = config["vectorizer_path"]
+    model_path = config["model_path"]
+    mlb_path = config["mlb_path"]
+
+    # Charger les objets
+    vectorizer = joblib.load(vectorizer_path)
+    model = joblib.load(model_path)
+    mlb = joblib.load(mlb_path)
+
+    return vectorizer, model, mlb

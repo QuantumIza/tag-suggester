@@ -1,0 +1,28 @@
+# Exclure les notebooks
+notebooks/
+*.ipynb
+
+# Exclure les données locales
+data/
+*.csv
+*.tsv
+*.json
+
+# Exclure les artefacts MLflow
+mlruns/
+
+# Exclure les checkpoints, modèles inutiles ailleurs
+checkpoints/
+
+# Ne PAS exclure les modèles dans src/tags_suggester/api/models/**/
+!src/tags_suggester/api/models/**.pkl
+!src/tags_suggester/api/models/**.joblib
+!src/tags_suggester/api/models/config_best_model.json
+
+# Exclure les fichiers de test si inutiles pour Heroku
+tests/
+
+# Exclure les fichiers temporaires
+__pycache__/
+*.log
+*.tmp

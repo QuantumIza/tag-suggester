@@ -8,7 +8,7 @@ import pickle
 import numpy as np
 from sentence_transformers import SentenceTransformer
 from scipy.sparse import load_npz
-from gensim.models import Word2Vec, KeyedVectors
+from pathlib import Path
 import tensorflow_hub as hub
 # from src.tags_suggester.api.services.model_loader import load_model_and_vectorizer
 # -----------------------------
@@ -110,13 +110,8 @@ def predict_tags_old_2(title, body):
     return predicted_tags
 
 
-import pickle
-import tensorflow_hub as hub
-import json
-import joblib
-from gensim.models import KeyedVectors
-from pathlib import Path
-from sentence_transformers import SentenceTransformer
+
+
 def load_pipeline_components():
     # 📁 Définir le chemin vers le dossier 'models'
     base_dir = Path(__file__).resolve().parent.parent / "models"
@@ -143,6 +138,7 @@ def load_pipeline_components():
         vectorizer = hub.load(use_local_path)
 
     elif vect_type in ["word2vec", "w2v"]:
+        from gensim.models import Word2Vec, KeyedVectors
         vectorizer = KeyedVectors.load(vectorizer_path)
 
     elif vect_type == "tfidf":

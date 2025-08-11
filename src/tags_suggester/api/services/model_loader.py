@@ -9,7 +9,7 @@ import numpy as np
 from sentence_transformers import SentenceTransformer
 from scipy.sparse import load_npz
 from pathlib import Path
-import tensorflow_hub as hub
+
 # from src.tags_suggester.api.services.model_loader import load_model_and_vectorizer
 # -----------------------------
 # 🔧 CONFIG PATH
@@ -131,6 +131,7 @@ def load_pipeline_components():
         vectorizer = SentenceTransformer(vectorizer_path)  # --- TODO : huggingface est au même emplacement que USE
 
     elif vect_type == "use":
+        import tensorflow_hub as hub
         # vectorizer_path pointe vers le fichier use_path.json
         with open(vectorizer_path, "r") as f:
             use_config = json.load(f)

@@ -128,6 +128,8 @@ def load_pipeline_components():
     # 🚀 Charger le vectoriseur selon le type
     if vect_type == "sbert":
         # Ex: 'all-MiniLM-L6-v2' ou chemin vers le modèle SBERT
+        model_path = "src/tags_suggester/api/models/sbert/sbert_model"
+        print("Contenu du dossier SBERT:", os.listdir(model_path) )
         vectorizer = SentenceTransformer(vectorizer_path)  # --- TODO : huggingface est au même emplacement que USE
 
     elif vect_type == "use":

@@ -6,7 +6,7 @@ notebooks/
 data/
 *.csv
 *.tsv
-*.json
+# *.json
 
 # Exclure les artefacts MLflow
 mlruns/

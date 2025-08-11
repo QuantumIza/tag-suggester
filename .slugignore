@@ -16,6 +16,7 @@ checkpoints/
 
 # Ne PAS exclure les modèles dans src/tags_suggester/api/models/**/
 !src/tags_suggester/api/models/
+!src/tags_suggester/api/models/sbert/sbert_model
 !src/tags_suggester/api/models/**.pkl
 !src/tags_suggester/api/models/**.joblib
 !src/tags_suggester/api/models/config_best_model.json

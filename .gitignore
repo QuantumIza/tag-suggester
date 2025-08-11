@@ -66,5 +66,7 @@ tests/test_embeddings_api.py
 
 
 src/tags_suggester/api/models/**
+!src/tags_suggester/api/models/sbert/sbert_model
+!src/tags_suggester/api/models/sbert/logreg_sbert.joblib
 !src/tags_suggester/api/models/config_best_model.json
 !src/tags_suggester/api/models/**.joblib

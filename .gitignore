@@ -63,3 +63,8 @@ src/**/top_level.txt
 # Tests temporaires
 tests/test_api.py
 tests/test_embeddings_api.py
+
+
+src/tags_suggester/api/models/**
+!src/tags_suggester/api/models/config_best_model.json
+!src/tags_suggester/api/models/**.joblib

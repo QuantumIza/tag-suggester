@@ -10,7 +10,7 @@ class Question(BaseModel):
     body: str
 
 # 🎯 Route POST pour prédiction des tags
-@router.post("/predict")
+@router.post("/")
 def predict_endpoint(q: Question):
     try:
         tags = predict_tags(q.title, q.body)

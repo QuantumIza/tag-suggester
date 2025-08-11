@@ -51,7 +51,8 @@ notebooks/data/vectors/
 *.pkl
 *.parquet
 *.txt
-
+# Fichiers html de report drift evidentlyAI
+notebooks/evidently_reports
 # Dossiers egg-info générés par setup.py
 src/**/tags_suggester.egg-info/
 src/**/dependency_links.txt

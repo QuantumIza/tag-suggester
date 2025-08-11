@@ -15,6 +15,8 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import mlflow
 import json
+from sklearn.metrics import f1_score, precision_score, recall_score
+from sklearn.exceptions import UndefinedMetricWarning
 
 
 
@@ -597,3 +599,78 @@ def load_pipeline_components(config_path="./models/config_best_model.json"):
     mlb = joblib.load(mlb_path)
 
     return vectorizer, model, mlb
+
+
+def get_true_labels(df, mlb):
+    return mlb.transform(df["Tags"])
+
+
+
+def evaluate_predictions(y_true, y_pred):
+    return {
+        "f1_score": f1_score(y_true, y_pred, average="macro"),
+        "precision": precision_score(y_true, y_pred, average="macro"),
+        "recall": recall_score(y_true, y_pred, average="macro")
+    }
+
+from sklearn.metrics import f1_score, precision_score, recall_score
+
+def evaluate_month(month, df, embeddings, model, mlb):
+    """
+    Évalue les performances du modèle de classification multilabel pour un mois donné.
+
+    Paramètres :
+    ----------
+    month : str
+        Nom ou identifiant du mois (ex: "2023-06").
+    df : pd.DataFrame
+        DataFrame contenant les textes et les tags du mois.
+    embeddings : np.ndarray
+        Matrice des embeddings SBERT pré-calculés pour les textes du mois.
+    model : sklearn classifier
+        Modèle de classification multilabel entraîné (ex: LogisticRegression).
+    mlb : MultiLabelBinarizer
+        Binariseur utilisé pour transformer les tags en vecteurs binaires.
+
+    Retour :
+    -------
+    dict
+        Dictionnaire contenant les scores F1, précision, recall, le mois et le nombre de textes.
+    """
+   
+    # print(f"\n# --- EVALUATION DU MOIS : {month}")
+    # Transformation des tags en vecteurs binaires
+    y_true = mlb.transform(df["Tags"])
+    # Prédiction des tags à partir des embeddings
+    y_pred = model.predict(embeddings)
+    precision = precision_score(y_true, y_pred, average='macro', zero_division=0)
+    recall = recall_score(y_true, y_pred, average='macro', zero_division=0)
+    f1 = f1_score(y_true, y_pred, average='macro', zero_division=0)
+    # Calcul des métriques de performance
+    scores = {
+        "mois": month,
+        "nb_textes": len(df),
+        "f1_score": f1_score(y_true, y_pred, average="macro"),
+        "precision": precision_score(y_true, y_pred, average="macro"),
+        "recall": recall_score(y_true, y_pred, average="macro")
+    }
+    
+    # print(f"# --- SCORES CALCULES POUR LE MOIS  {month} : {scores}")
+    return scores
+def get_transformator_path(best_vect, model_dir="models/"):
+    if best_vect == "sbert":
+        vectorizer_path = model_dir / "sbert" / "sbert_model"
+    elif best_vect == "use":
+        vectorizer_path = model_dir / "use_model" / "use_path.json"
+    elif best_vect in ["word2vec", "w2v"]:
+        vectorizer_path = model_dir / "word2vec" / "word2vec_titlebody_full.bin"
+    elif best_vect == "bow":
+        vectorizer_path = model_dir / "bow" / "vectorizer_bow_full.pkl"
+    elif best_vect == "tfidf":
+        vectorizer_path = model_dir / "tfidf" / "tfidf_vectorizer.joblib"
+    elif best_vect == "svd":
+        vectorizer_path = model_dir / "svd" / "tfidf_vectorizer.joblib"
+        svd_path = model_dir / "sbert" / "svd_model_10k.joblib"
+    else:
+        raise ValueError(f"🚫 Type de vecteur inconnu : {best_vect}")
+    return vectorizer_path

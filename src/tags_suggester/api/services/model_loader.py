@@ -144,7 +144,7 @@ def load_pipeline_components():
         # Ex: 'all-MiniLM-L6-v2' ou chemin vers le modèle SBERT
         # model_path = "src/tags_suggester/api/models/sbert/sbert_model"
         model_path = (base_dir / config["model_path"]).resolve()
-        print("Contenu du dossier SBERT:", os.listdir(model_path) )
+        print("Contenu du dossier SBERT:", os.listdir(vectorizer_path) )
         # vectorizer = SentenceTransformer(vectorizer_path)  # --- TODO : huggingface est au même emplacement que USE
         vectorizer = SentenceTransformer(str(vectorizer_path))
 

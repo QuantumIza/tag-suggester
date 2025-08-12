@@ -115,10 +115,13 @@ def predict_tags_old_2(title, body):
 def load_pipeline_components():
     # 📁 Définir le chemin vers le dossier 'models'
     # base_dir = Path(__file__).resolve().parent.parent / "models"
-    base_dir = Path(__file__).resolve().parent.parent  # ← src/tags_suggester/api
+   
     # config_path = base_dir / "config_best_model.json"
-    config_path = Path(__file__).resolve().parent / "config_best_model.json"
-
+    base_dir = Path(__file__).resolve().parent.parent  # ← src/tags_suggester/api
+    # config_path = Path(__file__).resolve().parent / "config_best_model.json"
+    from pathlib import Path
+    # Depuis model_loader.py
+    config_path = Path(__file__).resolve().parent.parent / "models" / "config_best_model.json"
 
     # 🔧 Charger la config du pipeline
     with open(config_path, "r") as f:

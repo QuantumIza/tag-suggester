@@ -70,3 +70,4 @@ src/tags_suggester/api/models/**
 !src/tags_suggester/api/models/sbert/logreg_sbert.joblib
 !src/tags_suggester/api/models/config_best_model.json
 !src/tags_suggester/api/models/**.joblib
+!src/tags_suggester/api/models/tags/multilabel_binarizer_full.pkl

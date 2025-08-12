@@ -123,45 +123,70 @@ def load_pipeline_components():
 
     # 🎛️ Récupérer le type de vectorisation et son chemin
     vect_type = config["vectorizer"]
-    vectorizer_path = config["vectorizer_path"]
+    # vectorizer_path = config["vectorizer_path"]
+    vectorizer_path = (base_dir / config["vectorizer_path"]).resolve()
+    model_path = (base_dir / config["model_path"]).resolve()
+    mlb_path = (base_dir / config["mlb_path"]).resolve() if config["mlb_path"] else None
+    svd_path = (base_dir / config["svd_path"]).resolve() if "svd_path" in config else None
+    # ✅ Vérification des fichiers
+    for path in [vectorizer_path, model_path, mlb_path, svd_path]:
+        if path and not path.exists():
+            raise FileNotFoundError(f"❌ Fichier introuvable : {path}")
 
     # 🚀 Charger le vectoriseur selon le type
     if vect_type == "sbert":
         # Ex: 'all-MiniLM-L6-v2' ou chemin vers le modèle SBERT
-        model_path = "src/tags_suggester/api/models/sbert/sbert_model"
+        # model_path = "src/tags_suggester/api/models/sbert/sbert_model"
+        model_path = (base_dir / config["model_path"]).resolve()
         print("Contenu du dossier SBERT:", os.listdir(model_path) )
-        vectorizer = SentenceTransformer(vectorizer_path)  # --- TODO : huggingface est au même emplacement que USE
+        # vectorizer = SentenceTransformer(vectorizer_path)  # --- TODO : huggingface est au même emplacement que USE
+        vectorizer = SentenceTransformer(str(vectorizer_path))
 
     elif vect_type == "use":
         import tensorflow_hub as hub
         # vectorizer_path pointe vers le fichier use_path.json
+        # with open(vectorizer_path, "r") as f:
+        #     use_config = json.load(f)
+        # use_local_path = use_config["path"]  # --- TODO : modifier emlacement
+        # vectorizer = hub.load(use_local_path)
+
         with open(vectorizer_path, "r") as f:
             use_config = json.load(f)
-        use_local_path = use_config["path"]  # --- TODO : modifier emlacement
-        vectorizer = hub.load(use_local_path)
+        use_local_path = (base_dir / use_config["path"]).resolve()
+        vectorizer = hub.load(str(use_local_path))
+
+
 
     elif vect_type in ["word2vec", "w2v"]:
         from gensim.models import Word2Vec, KeyedVectors
-        vectorizer = KeyedVectors.load(vectorizer_path)
+        # vectorizer = KeyedVectors.load(vectorizer_path)
+        vectorizer = KeyedVectors.load(str(vectorizer_path))
 
     elif vect_type == "tfidf":
-        vectorizer = joblib.load(vectorizer_path)
+        # vectorizer = joblib.load(vectorizer_path)
+        vectorizer = joblib.load(str(vectorizer_path))
 
     elif vect_type == "bow":
-        vectorizer = joblib.load(vectorizer_path)
+        # vectorizer = joblib.load(vectorizer_path)
+        vectorizer = joblib.load(str(vectorizer_path))
 
     elif vect_type == "svd":
-        vectorizer = joblib.load(vectorizer_path)
-        svd_path = config.get("svd_path")
-        svd_model = joblib.load(svd_path) if svd_path else None
+        # vectorizer = joblib.load(vectorizer_path)
+        vectorizer = joblib.load(str(vectorizer_path))
+        # svd_path = config.get("svd_path")
+        svd_path = (base_dir / config["svd_path"]).resolve() if "svd_path" in config else None
+        # svd_model = joblib.load(svd_path) if svd_path else None
+        svd_model = joblib.load(str(svd_path)) if svd_path else None
     else:
         raise ValueError(f"❌ Type de vectorisation inconnu : '{vect_type}'")
 
     # 🎯 Charger le modèle de classification
-    model = joblib.load(config["model_path"])
+    # model = joblib.load(config["model_path"])
+    model = joblib.load(str(model_path))
 
     # 🏷️ Charger le MultiLabelBinarizer
-    mlb = joblib.load(config["mlb_path"])
+    # mlb = joblib.load(config["mlb_path"])
+    mlb = joblib.load(str(mlb_path))
 
     # 🔁 Retourner tous les composants requis
     if vect_type == "svd":

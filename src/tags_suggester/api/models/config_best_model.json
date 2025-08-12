@@ -1,6 +1,6 @@
 {
     "vectorizer": "sbert",
-    "model_path": "D:\\machine_learning_training\\openclassrooms_projects\\05_categorisez_automatiquement_question\\src\\tags_suggester\\api\\models\\sbert\\logreg_sbert.joblib",
-    "vectorizer_path": "D:\\machine_learning_training\\openclassrooms_projects\\05_categorisez_automatiquement_question\\src\\tags_suggester\\api\\models\\sbert\\sbert_model",
-    "mlb_path": "D:\\machine_learning_training\\openclassrooms_projects\\05_categorisez_automatiquement_question\\notebooks\\models\\tags\\multilabel_binarizer_full.pkl"
+    "model_path": "models/sbert/logreg_sbert.joblib",
+    "vectorizer_path": "models/sbert/sbert_model",
+    "mlb_path": "models/tags/multilabel_binarizer_full.pkl"
 }

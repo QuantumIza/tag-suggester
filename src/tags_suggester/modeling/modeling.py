@@ -674,3 +674,96 @@ def get_transformator_path(best_vect, model_dir="models/"):
     else:
         raise ValueError(f"🚫 Type de vecteur inconnu : {best_vect}")
     return vectorizer_path
+
+
+
+
+def train_and_score_vector_full_metrics_custom(
+    name,
+    X_train,
+    X_test,
+    y_train,
+    y_test,
+    model_class,
+    model_wrapper=None,
+    preprocess=None,
+    X_text_train=None,
+    X_text_test=None
+):
+    from sklearn.metrics import precision_score, recall_score, f1_score, hamming_loss
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.pipeline import Pipeline
+    import numpy as np
+
+    print(f"\n🚀 Entraînement du modèle : {name}")
+
+    steps = []
+
+    if preprocess == "scale":
+        steps.append(("scaler", StandardScaler()))
+
+    clf = model_class()
+    if model_wrapper:
+        clf = model_wrapper(clf)
+
+    steps.append(("clf", clf))
+    pipe = Pipeline(steps)
+
+    pipe.fit(X_train, y_train)
+    y_pred = pipe.predict(X_test)
+
+    # 🔍 Métriques classiques multilabel
+    f1 = f1_score(y_test, y_pred, average="micro")
+    hamming = hamming_loss(y_test, y_pred)
+    coverage = (y_pred & y_test).sum() / y_test.sum()
+
+    # 🧪 Nouveaux scorings utiles
+    precision = precision_score(y_test, y_pred, average="micro")
+    recall = recall_score(y_test, y_pred, average="micro")
+    f1_macro = f1_score(y_test, y_pred, average="macro")
+
+    print(f"✅ Scores pour {name} :")
+    print(f"  - f1_micro: {f1:.4f}")
+    print(f"  - f1_macro: {f1_macro:.4f}")
+    print(f"  - precision_micro: {precision:.4f}")
+    print(f"  - recall_micro: {recall:.4f}")
+    print(f"  - hamming_loss: {hamming:.4f}")
+    print(f"  - coverage_tags: {coverage:.4f}")
+
+    # 📋 Log d'exemples mal prédits
+    if X_text_test is not None:
+        mismatches = np.where((y_pred != y_test).any(axis=1))[0]
+        print(f"\n🔍 {len(mismatches)} erreurs détectées sur {len(y_test)} exemples.")
+
+        for i in mismatches[:3]:
+            print(f"\n❌ Exemple mal prédit #{i}")
+            print(f"Texte : {X_text_test.iloc[i][:300]}...")
+            print(f"Tags réels : {np.where(y_test[i])[0]}")
+            print(f"Tags prédits : {np.where(y_pred[i])[0]}")
+
+    return {
+        "f1_micro": f1,
+        "f1_macro": f1_macro,
+        "precision_micro": precision,
+        "recall_micro": recall,
+        "hamming_loss": hamming,
+        "coverage_tags": coverage,
+        "model": pipe
+    }
+
+
+
+def split_on_indices_custom(X, Y, train_idx, test_idx):
+    from scipy.sparse import issparse
+
+    if issparse(X):
+        X_train = X[train_idx]
+        X_test = X[test_idx]
+    else:
+        X_train = X[train_idx, :]
+        X_test = X[test_idx, :]
+
+    y_train = Y[train_idx]
+    y_test = Y[test_idx]
+
+    return X_train, X_test, y_train, y_test

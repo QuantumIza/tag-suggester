@@ -16,25 +16,22 @@ if st.button("🔍 Suggérer des tags"):
         # Appel à l'API ML
         payload = {"title": title, "body": body}
         try:
-            response = requests.post("http://localhost:8000/predict/", json=payload)
+            # response = requests.post("http://localhost:8000/predict/", json=payload)
+            response = requests.post("https://tag-suggester-api-68852c62ac23.herokuapp.com/predict/", json=payload)
+
             if response.status_code == 200:
                 suggested_tags = response.json().get("suggested_tags", [])
                 st.session_state["suggested_tags"] = suggested_tags
             else:
-                st.error("Erreur lors de l'appel à l'API.")
+                st.error(f"Erreur API ({response.status_code}) : {response.text}")
         except Exception as e:
             st.error(f"Erreur réseau : {e}")
 
 # --- Sélection des tags suggérés ---
 if "suggested_tags" in st.session_state:
-    st.subheader("Tags suggérés par l'API")
-    selected_tags = st.multiselect(
-        "Sélectionne les tags (obligatoire)",
-        options=st.session_state["suggested_tags"],
-        placeholder="Choisis au moins un tag"
-    )
+    
     # --- AUTRE OPTION AFFICHAGE DES TEGS PROPOSES
-    st.subheader("Sélection alternative des tags (visuelle)")
+    st.subheader("SELECTION DE TAGS")
 
     selected_checkboxes = []
     for tag in st.session_state["suggested_tags"]:
@@ -49,8 +46,8 @@ if "suggested_tags" in st.session_state:
 
 
     # --- Bouton Next conditionnel ---
-    if selected_tags:
-        st.success(f"Tags sélectionnés : {', '.join(selected_tags)}")
+    if selected_checkboxes:
+        st.success(f"Tags sélectionnés : {', '.join(selected_checkboxes)}")
         st.button("✅ Next")
     else:
         st.warning("Tu dois sélectionner au moins un tag pour continuer.")

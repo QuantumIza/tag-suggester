@@ -375,3 +375,32 @@ def clean_doc_spacy_custom(doc, tech_terms=None, stopwords_set=None):
             final_tokens.append(lemma)
 
     return " ".join(sorted(preserved) + final_tokens)
+
+
+import re
+
+def clean_for_word2vec(text):
+    """
+    Nettoyage léger pour Word2Vec :
+    - Minuscule
+    - Suppression HTML
+    - Suppression ponctuation
+    - Conservation des stopwords
+    - Conservation de la structure des phrases
+    """
+    text = text.lower()
+    text = re.sub(r"<[^>]+>", " ", text)  # retire les balises HTML
+    text = re.sub(r"[^\w\s]", " ", text)  # retire ponctuation
+    text = re.sub(r"\s+", " ", text).strip()
+    return text
+
+def clean_for_embeddings(title, body):
+    """
+    Nettoyage minimal pour SBERT / USE :
+    - Concaténation titre + corps
+    - Suppression HTML
+    - Conservation ponctuation, majuscules, stopwords
+    """
+    text = f"{title} {body}"
+    text = re.sub(r"<[^>]+>", " ", text)  # retire HTML
+    return text.strip()

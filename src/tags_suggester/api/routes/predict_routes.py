@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
-from src.tags_suggester.api.services.model_loader import predict_tags
+from tags_suggester.api.services.model_loader import predict_tags
 
 router = APIRouter()
 

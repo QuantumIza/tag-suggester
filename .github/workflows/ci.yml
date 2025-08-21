@@ -46,6 +46,8 @@ jobs:
           if (-not $model_installed) {
             python -m spacy download en_core_web_sm
           }
+      - name: 📦 Installer le projet en mode editable
+        run: pip install -e .
 
       - name: 🧪 Lancer les tests
         run: pytest

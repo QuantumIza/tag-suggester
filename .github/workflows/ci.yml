@@ -15,7 +15,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: ⚔️ Purge totale des artefacts obsolètes
+      - name:  Purge totale des artefacts obsolètes
         run: |
           # Supprimer tous les fichiers .pyc
           Get-ChildItem -Recurse -Include *.pyc | Remove-Item -Force
@@ -32,22 +32,22 @@ jobs:
 
       
 
-      - name: 🚿 Purge du cache pip
+      - name:  Purge du cache pip
         run: pip cache purge
 
-      - name: 📦 Installer les dépendances
+      - name:  Installer les dépendances
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: 🧠 Vérifier et installer SpaCy model
+      - name:  Vérifier et installer SpaCy model
         run: |
           $model_installed = python -m spacy validate | Select-String "en_core_web_sm"
           if (-not $model_installed) {
             python -m spacy download en_core_web_sm
           }
-      - name: 📦 Installer le projet en mode editable
+      - name:  Installer le projet en mode editable
         run: pip install -e .
 
-      - name: 🧪 Lancer les tests
+      - name:  Lancer les tests
         run: pytest
